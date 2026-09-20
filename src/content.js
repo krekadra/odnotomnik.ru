@@ -327,6 +327,7 @@
 
     const strip = document.createElement('div');
     strip.className = 'oto-spreads-strip';
+    strip.style.setProperty('--oto-page-count', String(thumbnails.length));
     thumbnails.forEach((thumbnail) => strip.append(thumbnail));
     body.append(strip);
 
@@ -440,7 +441,7 @@
   }
 
   function enhanceSettingsPanel(panel, label, config) {
-    if (panel.dataset.otoSettings === 'true') return false;
+    if (panel.dataset.otoSettings === 'true' && panel.querySelector('.oto-choice-check')) return false;
     panel.dataset.otoSettings = 'true';
     panel.classList.add('oto-settings-panel');
     const heading = panel.querySelector('.panel-heading');

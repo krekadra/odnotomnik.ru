@@ -85,9 +85,9 @@
 .oto-settings-panel { display: grid; grid-template-columns: 215px minmax(0, 1fr); width: 100%; margin: 0 !important; overflow: hidden; border: 1px solid #dbe7e7; border-radius: 10px; box-shadow: none; }
 .oto-settings-panel > .panel-heading { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 0; border-right: 1px solid #e0eaea; color: #486266; background: #f6fafa; font-size: 12px; }.oto-settings-panel > .panel-heading .glyphicon { color: #087d80; }
 .oto-settings-panel > .panel-body { display: flex; align-items: center; justify-content: flex-start; gap: 8px; padding: 7px 9px; }
-.oto-settings-panel .properties-container { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: 8px; }
-.oto-settings-panel .property-item { position: relative; display: flex; flex: 0 1 auto; align-items: center; gap: 6px; max-width: 100%; width: auto !important; min-height: 36px; margin: 0 !important; overflow: hidden; padding: 6px 9px !important; border: 1px solid #d8e4e4 !important; border-radius: 8px !important; color: #41575b; background: #fff; font-size: 12px; line-height: 1.2; white-space: nowrap; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
-.oto-settings-panel .property-item > span:not(.oto-choice-check) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.oto-settings-panel .properties-container { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.oto-settings-panel .property-item { position: relative; display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; width: max-content !important; max-width: none; min-height: 36px; margin: 0 !important; overflow: visible; padding: 6px 9px !important; border: 1px solid #d8e4e4 !important; border-radius: 8px !important; color: #41575b; background: #fff; font-size: 12px; line-height: 1.2; white-space: nowrap; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+.oto-settings-panel .property-item > span:not(.oto-choice-check) { min-width: auto; overflow: visible; text-overflow: clip; white-space: nowrap; }
 .oto-settings-panel .property-item > i { flex: 0 0 auto; white-space: nowrap; }
 .oto-settings-panel .property-item:hover { border-color: #6fbabb !important; transform: translateY(-1px); }.oto-settings-panel .property-item_active { border-color: #087d80 !important; color: #075e62 !important; background: #e5f5f3 !important; box-shadow: inset 0 0 0 1px #087d80; }
 .oto-choice-check { display: none; color: #087d80; }.property-item_active > .oto-choice-check { display: inline-block; }
@@ -104,17 +104,21 @@
 .oto-editor .panel-book .calculator-books { display: none; }
 .oto-book-ok, .oto-book-warning { display: inline-block; margin-right: 14px; font-size: 12px; font-weight: 750; }
 .oto-book-ok { color: #218453; }.oto-book-warning { color: #c64c42; }
-.oto-spreads-strip { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-color: #9fc8c8 #edf4f4; scrollbar-width: thin; }
-.oto-editor .oto-spreads-strip > .thumbnail { position: relative; flex: 0 0 190px; width: 190px; min-height: 0; margin: 0; padding: 8px; border: 1px solid #dbe8e8; border-radius: 10px; background: #fff; }
+.oto-editor .panel-book, .oto-editor .panel-book > .book { width: 100%; }
+.oto-spreads-strip { display: grid; grid-template-columns: repeat(var(--oto-page-count), minmax(0, 1fr)); gap: 7px; width: 100%; overflow: visible; padding: 2px; }
+.oto-editor .oto-spreads-strip > .thumbnail { position: relative; min-width: 0; width: auto; min-height: 0; margin: 0; padding: 6px; border: 1px solid #dbe8e8; border-radius: 10px; background: #fff; }
 .oto-editor .oto-spreads-strip > .thumbnail.oto-has-warning { border-color: #df8179; background: #fff9f8; }
 .oto-editor .oto-spreads-strip > .thumbnail > .row { margin: 0; }
 .oto-editor .oto-spreads-strip > .thumbnail > .row > div:first-child { width: 100%; padding: 0; }
 .oto-editor .oto-spreads-strip > .thumbnail > .row > div:last-child { display: none; }
-.oto-editor .oto-spreads-strip .js-upload-image { display: block; height: 115px; overflow: hidden; border-radius: 6px; background: #eef3f3; }
+.oto-editor .oto-spreads-strip .js-upload-image { display: block; height: auto; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 6px; background: #eef3f3; }
 .oto-editor .oto-spreads-strip svg { width: 100%; height: 100%; }
 .oto-thumbnail-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; color: #30474c; font-size: 12px; }
 .oto-zoom { width: 27px; height: 27px; padding: 0; border: 1px solid #9dcfcf; border-radius: 7px; color: #087d80; background: #fff; font-size: 17px; line-height: 1; cursor: pointer; }
 .oto-zoom:hover { color: #fff; background: #087d80; }
+.oto-editor .oto-spreads-strip .oto-thumbnail-controls { gap: 3px; margin-bottom: 4px; font-size: 10px; white-space: nowrap; }
+.oto-editor .oto-spreads-strip .oto-thumbnail-controls strong { min-width: 0; }
+.oto-editor .oto-spreads-strip .oto-zoom { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 6px; font-size: 14px; }
 .oto-file-warning { margin: 7px 0 0; color: #b43d35; font-size: 11px; line-height: 1.3; }
 #oto-image-modal { position: fixed; z-index: 100000; inset: 0; display: none; align-items: center; justify-content: center; padding: 28px; background: rgb(13 31 35 / 82%); }
 #oto-image-modal.is-open { display: flex; }
@@ -123,4 +127,4 @@
 .oto-image-dialog header button { border: 0; color: #566b70; background: transparent; font-size: 27px; cursor: pointer; }
 .oto-image-dialog img { display: block; max-width: 100%; max-height: calc(92vh - 52px); object-fit: contain; background: #eef2f2; }
 @keyframes oto-pulse { 50% { opacity: .25; transform: scale(.65); } }
-@media (max-width: 720px) { .oto-shell, .oto-cart { padding: 0 10px; } .oto-page-head { display: block; padding: 21px; } .oto-progress { margin-top: 14px !important; white-space: normal; } .oto-summary { grid-template-columns: 1fr; } .oto-summary > section:first-child { border-right: 0; border-bottom: 1px solid #e6eeee; } .oto-spec dl { grid-template-columns: 1fr; } .oto-order > header, .oto-order > footer { padding-inline: 15px; } .oto-summary > section { padding-inline: 15px; } .oto-order details { max-width: 65%; } .oto-cart-head { padding: 21px; } .oto-cart-body li { grid-template-columns: 1fr; gap: 4px; } .oto-cart-item > header, .oto-cart-body, .oto-cart-item footer { padding-inline: 15px; } .oto-settings-topline { display: block; }.oto-standard-preset { width: 100%; margin-top: 10px; }.oto-settings-summary > span { white-space: nowrap; }.oto-settings-panel { display: block; }.oto-settings-panel > .panel-heading { border-right: 0; border-bottom: 1px solid #e0eaea; }.oto-settings-panel > .panel-body { display: block; }.oto-more-toggle { margin-top: 7px; }.oto-counters-row { flex-direction: column; }.oto-counter { width: auto; }.oto-editor .panel-book > .panel-heading .row { display: block; } .oto-editor .panel-book > .panel-heading .text-right { margin-top: 7px; text-align: left; } .oto-editor .oto-spreads-strip > .thumbnail { flex-basis: 160px; width: 160px; } }
+@media (max-width: 720px) { .oto-shell, .oto-cart { padding: 0 10px; } .oto-page-head { display: block; padding: 21px; } .oto-progress { margin-top: 14px !important; white-space: normal; } .oto-summary { grid-template-columns: 1fr; } .oto-summary > section:first-child { border-right: 0; border-bottom: 1px solid #e6eeee; } .oto-spec dl { grid-template-columns: 1fr; } .oto-order > header, .oto-order > footer { padding-inline: 15px; } .oto-summary > section { padding-inline: 15px; } .oto-order details { max-width: 65%; } .oto-cart-head { padding: 21px; } .oto-cart-body li { grid-template-columns: 1fr; gap: 4px; } .oto-cart-item > header, .oto-cart-body, .oto-cart-item footer { padding-inline: 15px; } .oto-settings-topline { display: block; }.oto-standard-preset { width: 100%; margin-top: 10px; }.oto-settings-summary > span { white-space: nowrap; }.oto-settings-panel { display: block; }.oto-settings-panel > .panel-heading { border-right: 0; border-bottom: 1px solid #e0eaea; }.oto-settings-panel > .panel-body { display: block; }.oto-more-toggle { margin-top: 7px; }.oto-counters-row { flex-direction: column; }.oto-counter { width: auto; }.oto-editor .panel-book > .panel-heading .row { display: block; } .oto-editor .panel-book > .panel-heading .text-right { margin-top: 7px; text-align: left; } .oto-spreads-strip { display: flex; overflow-x: auto; padding-bottom: 10px; scrollbar-color: #9fc8c8 #edf4f4; scrollbar-width: thin; } .oto-editor .oto-spreads-strip > .thumbnail { flex: 0 0 160px; width: 160px; } }
