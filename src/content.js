@@ -229,6 +229,12 @@
       .join(' · ') || fallback || 'Фотокнига';
   }
 
+  function pageLamination(specifications) {
+    const fields = specifications[0]?.fields || {};
+    const match = Object.entries(fields).find(([label]) => /защит[аы]\s+лист|ламинаци[яи]\s+лист|ламинаци[яи]\s+страниц/i.test(label));
+    return clean(match?.[1]);
+  }
+
   function imageSource(element, baseUrl) {
     const source = element?.getAttribute('href') || element?.getAttribute('xlink:href') || element?.getAttribute('src') || element?.getAttribute('data-src');
     if (!source) return '';
@@ -320,10 +326,11 @@
       const removeLink = item.querySelector('.js-remove-item');
       const specifications = cartSpecifications(type?.dataset.originalTitle || type?.getAttribute('data-original-title'));
       const bookTitle = cartBookTitle(specifications, clean(type?.childNodes[0]?.textContent));
+      const pagesFinish = pageLamination(specifications);
       const card = document.createElement('article');
       card.className = 'oto-cart-item';
       card.innerHTML = `
-        <header><div><h3>${escapeHtml(bookTitle)}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p></div></header>
+        <header><div><h3>${escapeHtml(bookTitle)}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p>${pagesFinish ? `<p class="oto-pages-finish">Ламинация страниц: ${finishHtml(pagesFinish)}</p>` : ''}</div></header>
         <div class="oto-cart-body"><section><h4>В печати</h4><ul>${specifications.map((specification) => cartSpecificationHtml(specification, viewLink?.href)).join('') || '<li>Параметры недоступны.</li>'}</ul></section></div>
         <footer><div class="oto-cart-actions">${viewLink ? `<a class="oto-view" href="${escapeHtml(viewLink.href)}">Смотреть макеты</a>` : ''}${editLink ? `<a class="oto-edit" href="${escapeHtml(editLink.href)}">Редактировать</a>` : ''}</div></footer>`;
       if (removeLink) {
