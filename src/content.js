@@ -202,10 +202,14 @@
     return specifications;
   }
 
+  function finishHtml(value) {
+    return escapeHtml(value).replace(/ЗЕРНО/gi, '<span class="oto-finish oto-finish-grain"><span class="glyphicon glyphicon-grain" aria-hidden="true"></span>ЗЕРНО</span>');
+  }
+
   function cartSpecificationHtml(specification, viewUrl) {
     const fields = specification.fields;
     const preview = viewUrl ? `<a class="oto-cart-preview" href="${escapeHtml(viewUrl)}" title="Открыть макеты"><span>Загрузка обложки…</span></a>` : '';
-    return `<li><strong>${escapeHtml(specification.title)}</strong><span>${escapeHtml(fields['Формат'] || 'Формат не указан')} · ${escapeHtml(fields['Развороты'] || 'развороты не указаны')}</span><small>${escapeHtml(fields['Обложка'] || '')}</small>${preview}</li>`;
+    return `<li><strong>${escapeHtml(specification.title)}</strong><span>${escapeHtml(fields['Формат'] || 'Формат не указан')} · ${escapeHtml(fields['Развороты'] || 'развороты не указаны')}</span><small>${finishHtml(fields['Обложка'] || '')}</small>${preview}</li>`;
   }
 
   function cartBookTitle(specifications, fallback) {
