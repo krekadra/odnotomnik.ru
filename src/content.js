@@ -203,7 +203,8 @@
   }
 
   function finishHtml(value) {
-    return escapeHtml(value).replace(/ЗЕРНО/gi, '<span class="oto-finish oto-finish-grain"><span class="glyphicon glyphicon-grain" aria-hidden="true"></span>ЗЕРНО</span>');
+    const grainIcon = '<svg class="oto-grain-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1.5c-2 2.7-4.2 4.6-4.2 7.2A4.2 4.2 0 0 0 8 13a4.2 4.2 0 0 0 4.2-4.3C12.2 6.1 10 4.2 8 1.5Z"/><circle cx="6.6" cy="8.2" r=".55"/><circle cx="8.8" cy="9.3" r=".55"/><circle cx="8.2" cy="6.5" r=".45"/></svg>';
+    return escapeHtml(value).replace(/ЗЕРНО/gi, `<span class="oto-finish oto-finish-grain">${grainIcon}ЗЕРНО</span>`);
   }
 
   function cartSpecificationHtml(specification, viewUrl) {

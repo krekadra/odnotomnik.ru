@@ -64,7 +64,7 @@
 .oto-cart-body ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
 .oto-cart-body li { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(180px, .7fr) minmax(260px, 1fr) 108px; gap: 16px; align-items: center; padding: 12px 14px; border: 1px solid #d8e8e7; border-radius: 10px; background: #f9fdfd; color: #314b50; font-size: 14px; }
 .oto-cart-body li strong { color: #17383d; }.oto-cart-body li small { color: #668085; font-size: 12px; }
-.oto-finish { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }.oto-finish-grain { color: #087d80; font-weight: 750; }.oto-finish-grain .glyphicon { font-size: 11px; }
+.oto-finish { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }.oto-finish-grain { color: #087d80; font-weight: 750; }.oto-grain-icon { width: 14px; height: 14px; fill: currentColor; flex: 0 0 14px; }
 .oto-cart-preview { display: grid; width: 108px; height: 72px; place-items: center; justify-self: end; overflow: hidden; border: 1px solid #cfe4e4; border-radius: 8px; color: #698287; background: #fff; font-size: 10px; line-height: 1.2; text-align: center; text-decoration: none !important; }
 .oto-cart-preview:hover { border-color: #087d80; }.oto-cart-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }.oto-cart-preview.is-unavailable { color: #9b7772; background: #fff9f8; }
 .oto-preview-loader { position: fixed; z-index: -1; width: 1px; height: 1px; inset: -10px auto auto -10px; border: 0; opacity: 0; pointer-events: none; }
