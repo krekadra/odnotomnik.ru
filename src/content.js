@@ -235,6 +235,11 @@
     return clean(match?.[1]);
   }
 
+  function setPageLamination(target, value) {
+    if (!target || !value) return;
+    target.innerHTML = `Ламинация страниц: ${finishHtml(value)}`;
+  }
+
   function imageSource(element, baseUrl) {
     const source = element?.getAttribute('href') || element?.getAttribute('xlink:href') || element?.getAttribute('src') || element?.getAttribute('data-src');
     if (!source) return '';
@@ -274,6 +279,35 @@
         const covers = markup ? coverSources(markup, pageUrl) : [];
         if (covers.length || Date.now() - startedAt >= timeoutMs) {
           finish(covers);
+          return;
+        }
+        window.setTimeout(inspect, 350);
+      };
+      frame.className = 'oto-preview-loader';
+      frame.src = pageUrl;
+      frame.addEventListener('load', () => window.setTimeout(inspect, 250), { once: true });
+      document.body.append(frame);
+      window.setTimeout(inspect, 500);
+    });
+  }
+
+  function livePageLamination(pageUrl) {
+    return new Promise((resolve) => {
+      const frame = document.createElement('iframe');
+      const startedAt = Date.now();
+      const timeoutMs = 9000;
+      let finished = false;
+      const finish = (value) => {
+        if (finished) return;
+        finished = true;
+        frame.remove();
+        resolve(value);
+      };
+      const inspect = () => {
+        const selected = frame.contentDocument?.querySelector('.js-set-property[data-group="47"].property-item_active');
+        const value = clean(selected?.querySelector('span')?.textContent || selected?.textContent);
+        if (value || Date.now() - startedAt >= timeoutMs) {
+          finish(value);
           return;
         }
         window.setTimeout(inspect, 350);
@@ -330,7 +364,7 @@
       const card = document.createElement('article');
       card.className = 'oto-cart-item';
       card.innerHTML = `
-        <header><div><h3>${escapeHtml(bookTitle)}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p>${pagesFinish ? `<p class="oto-pages-finish">Ламинация страниц: ${finishHtml(pagesFinish)}</p>` : ''}</div></header>
+        <header><div><h3>${escapeHtml(bookTitle)}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p><p class="oto-pages-finish">${pagesFinish ? `Ламинация страниц: ${finishHtml(pagesFinish)}` : ''}</p></div></header>
         <div class="oto-cart-body"><section><h4>В печати</h4><ul>${specifications.map((specification) => cartSpecificationHtml(specification, viewLink?.href)).join('') || '<li>Параметры недоступны.</li>'}</ul></section></div>
         <footer><div class="oto-cart-actions">${viewLink ? `<a class="oto-view" href="${escapeHtml(viewLink.href)}">Смотреть макеты</a>` : ''}${editLink ? `<a class="oto-edit" href="${escapeHtml(editLink.href)}">Редактировать</a>` : ''}</div></footer>`;
       if (removeLink) {
@@ -340,6 +374,9 @@
       cards.append(card);
       const previewSlots = [...card.querySelectorAll('.oto-cart-preview')];
       if (viewLink && previewSlots.length) void loadCartCoverPreviews(previewSlots, [viewLink.href, editLink?.href]);
+      if (editLink && !pagesFinish) {
+        void livePageLamination(editLink.href).then((value) => setPageLamination(card.querySelector('.oto-pages-finish'), value));
+      }
     });
 
     const originalItems = document.querySelector('#items');
