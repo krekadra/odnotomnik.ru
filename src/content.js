@@ -209,7 +209,7 @@
   }
 
   function imageSource(element, baseUrl) {
-    const source = element?.getAttribute('href') || element?.getAttribute('xlink:href') || element?.getAttribute('src');
+    const source = element?.getAttribute('href') || element?.getAttribute('xlink:href') || element?.getAttribute('src') || element?.getAttribute('data-src');
     if (!source) return '';
     try {
       return new URL(source, baseUrl).href;
@@ -222,7 +222,7 @@
     const page = new DOMParser().parseFromString(markup, 'text/html');
     const thumbnails = [...page.querySelectorAll('.thumbnail')];
     const covers = thumbnails
-      .filter((thumbnail) => clean(thumbnail.querySelector('th')?.textContent) === 'Обложка')
+      .filter((thumbnail) => clean(thumbnail.querySelector('th, .title, strong')?.textContent) === 'Обложка')
       .map((thumbnail) => imageSource(thumbnail.querySelector('svg image, img'), pageUrl))
       .filter(Boolean);
     if (covers.length) return covers;
@@ -230,11 +230,42 @@
     return fallback ? [fallback] : [];
   }
 
-  async function loadCartCoverPreviews(slots, pageUrl) {
+  function liveCoverSources(pageUrl) {
+    return new Promise((resolve) => {
+      const frame = document.createElement('iframe');
+      const startedAt = Date.now();
+      const timeoutMs = 9000;
+      let finished = false;
+      const finish = (covers) => {
+        if (finished) return;
+        finished = true;
+        frame.remove();
+        resolve(covers);
+      };
+      const inspect = () => {
+        const markup = frame.contentDocument?.documentElement?.outerHTML || '';
+        const covers = markup ? coverSources(markup, pageUrl) : [];
+        if (covers.length || Date.now() - startedAt >= timeoutMs) {
+          finish(covers);
+          return;
+        }
+        window.setTimeout(inspect, 350);
+      };
+      frame.className = 'oto-preview-loader';
+      frame.src = pageUrl;
+      frame.addEventListener('load', () => window.setTimeout(inspect, 250), { once: true });
+      document.body.append(frame);
+      window.setTimeout(inspect, 500);
+    });
+  }
+
+  async function loadCartCoverPreviews(slots, pageUrls) {
     try {
-      const response = await fetch(pageUrl, { credentials: 'same-origin' });
-      if (!response.ok) throw new Error(`Preview request failed: ${response.status}`);
-      const covers = coverSources(await response.text(), pageUrl);
+      let covers = [];
+      for (const pageUrl of pageUrls.filter(Boolean)) {
+        covers = await liveCoverSources(pageUrl);
+        if (covers.length) break;
+      }
       if (!covers.length) throw new Error('No cover image found');
       slots.forEach((slot, index) => {
         const image = document.createElement('img');
@@ -279,7 +310,7 @@
       }
       cards.append(card);
       const previewSlots = [...card.querySelectorAll('.oto-cart-preview')];
-      if (viewLink && previewSlots.length) void loadCartCoverPreviews(previewSlots, viewLink.href);
+      if (viewLink && previewSlots.length) void loadCartCoverPreviews(previewSlots, [viewLink.href, editLink?.href]);
     });
 
     const originalItems = document.querySelector('#items');

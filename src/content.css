@@ -66,6 +66,7 @@
 .oto-cart-body li strong { color: #17383d; }.oto-cart-body li small { color: #668085; font-size: 12px; }
 .oto-cart-preview { display: grid; width: 108px; height: 72px; place-items: center; justify-self: end; overflow: hidden; border: 1px solid #cfe4e4; border-radius: 8px; color: #698287; background: #fff; font-size: 10px; line-height: 1.2; text-align: center; text-decoration: none !important; }
 .oto-cart-preview:hover { border-color: #087d80; }.oto-cart-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }.oto-cart-preview.is-unavailable { color: #9b7772; background: #fff9f8; }
+.oto-preview-loader { position: fixed; z-index: -1; width: 1px; height: 1px; inset: -10px auto auto -10px; border: 0; opacity: 0; pointer-events: none; }
 .oto-cart-item footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 20px; border-top: 1px solid #e6eeee; background: #fcfefe; }
 .oto-cart-actions { display: flex; flex-wrap: wrap; gap: 9px; }
 .oto-cart-actions a { padding: 8px 11px; border-radius: 8px; font-size: 13px; font-weight: 750; text-decoration: none !important; }
