@@ -208,6 +208,22 @@
     return `<li><strong>${escapeHtml(specification.title)}</strong><span>${escapeHtml(fields['Формат'] || 'Формат не указан')} · ${escapeHtml(fields['Развороты'] || 'развороты не указаны')}</span><small>${escapeHtml(fields['Обложка'] || '')}</small>${preview}</li>`;
   }
 
+  function cartBookTitle(specifications, fallback) {
+    const specification = specifications[0];
+    if (!specification) return fallback || 'Фотокнига';
+    const fields = specification.fields;
+    const type = clean(specification.title).replace(/^Выпускной\s+(альбом|папка)\s+/i, '');
+    const format = clean(fields['Формат']);
+    const spreads = clean(fields['Развороты']).replace(/\s*разворот(?:ов|а)?\.?$/i, '');
+    const paper = clean(fields['Бумага']);
+    const protection = clean(fields['Дополнительная защита листов']);
+    const paperSummary = /без\s+основы/i.test(paper) ? 'без подложки' : '';
+    const protectionSummary = /зерно/i.test(protection) ? 'зерно' : '';
+    return [type, format, spreads ? `${spreads} разв.` : '', paperSummary, protectionSummary]
+      .filter(Boolean)
+      .join(' · ') || fallback || 'Фотокнига';
+  }
+
   function imageSource(element, baseUrl) {
     const source = element?.getAttribute('href') || element?.getAttribute('xlink:href') || element?.getAttribute('src') || element?.getAttribute('data-src');
     if (!source) return '';
@@ -298,10 +314,11 @@
       const editLink = type?.querySelector('a[href*="/designer/edit/"]');
       const removeLink = item.querySelector('.js-remove-item');
       const specifications = cartSpecifications(type?.dataset.originalTitle || type?.getAttribute('data-original-title'));
+      const bookTitle = cartBookTitle(specifications, clean(type?.childNodes[0]?.textContent));
       const card = document.createElement('article');
       card.className = 'oto-cart-item';
       card.innerHTML = `
-        <header><div><h3>${escapeHtml(clean(type?.childNodes[0]?.textContent) || 'Фотокнига')}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p></div></header>
+        <header><div><h3>${escapeHtml(bookTitle)}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p></div></header>
         <div class="oto-cart-body"><section><h4>В печати</h4><ul>${specifications.map((specification) => cartSpecificationHtml(specification, viewLink?.href)).join('') || '<li>Параметры недоступны.</li>'}</ul></section></div>
         <footer><div class="oto-cart-actions">${viewLink ? `<a class="oto-view" href="${escapeHtml(viewLink.href)}">Смотреть макеты</a>` : ''}${editLink ? `<a class="oto-edit" href="${escapeHtml(editLink.href)}">Редактировать</a>` : ''}</div></footer>`;
       if (removeLink) {
