@@ -184,7 +184,8 @@
   function cartSpecifications(rawHtml) {
     const scratch = document.createElement('div');
     scratch.innerHTML = rawHtml || '';
-    const lines = (scratch.innerText || '').split(/\r?\n/).map(clean).filter(Boolean);
+    scratch.querySelectorAll('br').forEach((breakElement) => breakElement.replaceWith('\n'));
+    const lines = (scratch.textContent || '').split(/\r?\n/).map(clean).filter(Boolean);
     const specifications = [];
     let specification = null;
 
@@ -207,9 +208,9 @@
   }
 
   function runCart() {
-    if (document.getElementById(ROOT_ID)) return;
+    if (document.getElementById(ROOT_ID)) return true;
     const items = [...document.querySelectorAll('#items > .hidden-xs .item.row[data-id]')];
-    if (!items.length) return;
+    if (!items.length) return false;
 
     const root = document.createElement('section');
     root.id = ROOT_ID;
@@ -239,8 +240,119 @@
     const originalItems = document.querySelector('#items');
     originalItems.before(root);
     originalItems.classList.add('oto-original-cart');
+    return true;
   }
 
-  if (location.pathname === '/shopcart') runCart();
+  function waitForCart() {
+    if (runCart()) return;
+    const observer = new MutationObserver(() => {
+      if (runCart()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function ensureImageModal() {
+    let modal = document.getElementById('oto-image-modal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'oto-image-modal';
+    modal.innerHTML = '<div class="oto-image-dialog"><header><strong></strong><button type="button" aria-label="Закрыть">×</button></header><img alt="Увеличенный макет"></div>';
+    const close = () => modal.classList.remove('is-open');
+    modal.addEventListener('click', (event) => { if (event.target === modal) close(); });
+    modal.querySelector('button').addEventListener('click', close);
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') close(); });
+    document.body.append(modal);
+    return modal;
+  }
+
+  function openImageModal(title, source) {
+    const modal = ensureImageModal();
+    modal.querySelector('strong').textContent = title;
+    modal.querySelector('img').src = source;
+    modal.classList.add('is-open');
+  }
+
+  function getThumbnailTitle(thumbnail) {
+    return clean(thumbnail.querySelector('table th')?.textContent) || 'Макет';
+  }
+
+  function getThumbnailSource(thumbnail) {
+    const image = thumbnail.querySelector('svg image');
+    return image?.getAttribute('href') || image?.getAttribute('xlink:href') || '';
+  }
+
+  function getFileWarning(thumbnail) {
+    if (thumbnail.querySelector('.status-file .text-success')) return '';
+    const rows = [...thumbnail.querySelectorAll('table tr')];
+    const details = rows.slice(1).map((row) => clean(row.textContent)).filter(Boolean).join(' · ');
+    return details || 'Файл требует проверки';
+  }
+
+  function enhanceThumbnail(thumbnail) {
+    if (thumbnail.dataset.otoReady === 'true') return;
+    thumbnail.dataset.otoReady = 'true';
+    const title = getThumbnailTitle(thumbnail);
+    const source = getThumbnailSource(thumbnail);
+    const warning = getFileWarning(thumbnail);
+    thumbnail.classList.toggle('oto-has-warning', Boolean(warning));
+
+    const controls = document.createElement('div');
+    controls.className = 'oto-thumbnail-controls';
+    controls.innerHTML = `<strong>${escapeHtml(title)}</strong>${source ? '<button type="button" class="oto-zoom" aria-label="Увеличить макет" title="Увеличить макет">⛶</button>' : ''}`;
+    if (source) controls.querySelector('button').addEventListener('click', () => openImageModal(title, source));
+    thumbnail.prepend(controls);
+
+    const table = thumbnail.querySelector('.table-responsive');
+    if (table) table.hidden = true;
+    if (warning) {
+      const message = document.createElement('p');
+      message.className = 'oto-file-warning';
+      message.textContent = warning;
+      thumbnail.append(message);
+    }
+  }
+
+  function enhanceBook(panel) {
+    if (panel.dataset.otoReady === 'true') return;
+    const book = panel.querySelector('.book');
+    const body = book?.querySelector(':scope > .panel-body');
+    const thumbnails = body ? [...body.querySelectorAll(':scope > .thumbnail')] : [];
+    if (!book || !body || !thumbnails.length) return;
+
+    panel.dataset.otoReady = 'true';
+    panel.classList.add('oto-book-panel');
+    book.classList.add('in');
+    book.style.height = 'auto';
+    thumbnails.forEach(enhanceThumbnail);
+
+    const strip = document.createElement('div');
+    strip.className = 'oto-spreads-strip';
+    thumbnails.forEach((thumbnail) => strip.append(thumbnail));
+    body.append(strip);
+
+    const warningCount = thumbnails.filter((thumbnail) => thumbnail.classList.contains('oto-has-warning')).length;
+    const status = document.createElement('span');
+    status.className = warningCount ? 'oto-book-warning' : 'oto-book-ok';
+    status.textContent = warningCount ? `${warningCount} ${warningCount === 1 ? 'ошибка' : 'ошибки'}` : 'Файлы проверены';
+    panel.querySelector('.panel-heading .text-right')?.prepend(status);
+  }
+
+  function enhanceEditor() {
+    const panels = [...document.querySelectorAll('.panel-book')];
+    if (!panels.length) return false;
+    document.body.classList.add('oto-editor');
+    panels.forEach(enhanceBook);
+    ensureImageModal();
+    return true;
+  }
+
+  function watchEditor() {
+    enhanceEditor();
+    const observer = new MutationObserver(() => enhanceEditor());
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (location.pathname === '/shopcart') waitForCart();
   else if (location.pathname === '/profile/orders') run();
+  else if (location.pathname.startsWith('/photobook/designer/edit/')) watchEditor();
 })();

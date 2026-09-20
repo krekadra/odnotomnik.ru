@@ -5,7 +5,11 @@
   "version": "0.1.0",
   "content_scripts": [
     {
-      "matches": ["https://odnotomnik.ru/profile/orders*", "https://odnotomnik.ru/shopcart*"],
+      "matches": [
+        "https://odnotomnik.ru/profile/orders*",
+        "https://odnotomnik.ru/shopcart*",
+        "https://odnotomnik.ru/photobook/designer/edit/*"
+      ],
       "js": ["src/content.js"],
       "css": ["src/content.css"],
       "run_at": "document_idle"
