@@ -348,6 +348,23 @@
 
   const STANDARD_PROPERTY_IDS = ['525', '13', '24886', '21380', '24363'];
 
+  const SETTING_GROUPS = {
+    'Группа фотокниг': '15',
+    'Тип фотокниги': '13',
+    'Формат': '1',
+    'Обложка': '2',
+    'Бумага': '6',
+    'Дополнительная защита листов': '47',
+  };
+
+  const SHORT_OPTION_LABELS = {
+    '497': 'Классические', '525': 'Полиграфические',
+    '6': 'Папка Лайфлат', '13': 'Альбом Лайфлат', '14': 'Альбом Стандарт', '4': 'Стандарт мягкий', '10': 'Папка Двойка', '11': 'Папка Тройка',
+    '21314': 'Матовая', '21315': 'Глянцевая', '24886': 'Зерно',
+    '21380': 'Без основы 0,6 мм', '21379': 'Картон 1 мм', '21378': 'Картон 1,4 мм', '22250': 'Пластик 1,2 мм',
+    '21381': 'Матовая', '21382': 'Глянцевая', '24363': 'Зерно',
+  };
+
   function settingsPanel(label) {
     return [...document.querySelectorAll('.calculator-params .panel')].find((panel) => {
       const heading = panel.querySelector(':scope > .panel-heading');
@@ -356,7 +373,8 @@
   }
 
   function activeSetting(label) {
-    return clean(settingsPanel(label)?.querySelector('.property-item_active span')?.textContent);
+    const group = SETTING_GROUPS[label];
+    return clean(document.querySelector(`.js-set-property[data-group="${group}"].property-item_active span`)?.textContent);
   }
 
   function grainIsSynchronized() {
@@ -427,11 +445,19 @@
     panel.classList.add('oto-settings-panel');
     const heading = panel.querySelector('.panel-heading');
     heading.dataset.otoLabel = label;
-    heading.innerHTML = `<span class="glyphicon ${config.icon}" aria-hidden="true"></span><strong>${escapeHtml(label)}</strong>`;
+    const displayLabel = label === 'Дополнительная защита листов' ? 'Защита листов' : label;
+    heading.innerHTML = `<span class="glyphicon ${config.icon}" aria-hidden="true"></span><strong>${escapeHtml(displayLabel)}</strong>`;
 
     let hiddenCount = 0;
     panel.querySelectorAll('.property-item').forEach((option) => {
       const id = option.dataset.id;
+      const title = clean(option.querySelector('span')?.textContent);
+      const shortLabel = SHORT_OPTION_LABELS[id];
+      if (shortLabel) {
+        const titleElement = option.querySelector('span');
+        titleElement.textContent = shortLabel;
+        option.title = title;
+      }
       const tag = document.createElement('small');
       tag.className = 'oto-usage-tag';
       if (config.favorite.includes(id)) {
