@@ -202,9 +202,52 @@
     return specifications;
   }
 
-  function cartSpecificationHtml(specification) {
+  function cartSpecificationHtml(specification, viewUrl) {
     const fields = specification.fields;
-    return `<li><strong>${escapeHtml(specification.title)}</strong><span>${escapeHtml(fields['Формат'] || 'Формат не указан')} · ${escapeHtml(fields['Развороты'] || 'развороты не указаны')}</span><small>${escapeHtml(fields['Обложка'] || '')}</small></li>`;
+    const preview = viewUrl ? `<a class="oto-cart-preview" href="${escapeHtml(viewUrl)}" title="Открыть макеты"><span>Загрузка обложки…</span></a>` : '';
+    return `<li><strong>${escapeHtml(specification.title)}</strong><span>${escapeHtml(fields['Формат'] || 'Формат не указан')} · ${escapeHtml(fields['Развороты'] || 'развороты не указаны')}</span><small>${escapeHtml(fields['Обложка'] || '')}</small>${preview}</li>`;
+  }
+
+  function imageSource(element, baseUrl) {
+    const source = element?.getAttribute('href') || element?.getAttribute('xlink:href') || element?.getAttribute('src');
+    if (!source) return '';
+    try {
+      return new URL(source, baseUrl).href;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function coverSources(markup, pageUrl) {
+    const page = new DOMParser().parseFromString(markup, 'text/html');
+    const thumbnails = [...page.querySelectorAll('.thumbnail')];
+    const covers = thumbnails
+      .filter((thumbnail) => clean(thumbnail.querySelector('th')?.textContent) === 'Обложка')
+      .map((thumbnail) => imageSource(thumbnail.querySelector('svg image, img'), pageUrl))
+      .filter(Boolean);
+    if (covers.length) return covers;
+    const fallback = imageSource(page.querySelector('.thumbnail svg image, .thumbnail img'), pageUrl);
+    return fallback ? [fallback] : [];
+  }
+
+  async function loadCartCoverPreviews(slots, pageUrl) {
+    try {
+      const response = await fetch(pageUrl, { credentials: 'same-origin' });
+      if (!response.ok) throw new Error(`Preview request failed: ${response.status}`);
+      const covers = coverSources(await response.text(), pageUrl);
+      if (!covers.length) throw new Error('No cover image found');
+      slots.forEach((slot, index) => {
+        const image = document.createElement('img');
+        image.src = covers[index] || covers[0];
+        image.alt = `Обложка ${index + 1}`;
+        slot.replaceChildren(image);
+      });
+    } catch (error) {
+      slots.forEach((slot) => {
+        slot.textContent = 'Обложка недоступна';
+        slot.classList.add('is-unavailable');
+      });
+    }
   }
 
   function runCart() {
@@ -228,13 +271,15 @@
       card.className = 'oto-cart-item';
       card.innerHTML = `
         <header><div><h3>${escapeHtml(clean(type?.childNodes[0]?.textContent) || 'Фотокнига')}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p></div></header>
-        <div class="oto-cart-body"><section><h4>В печати</h4><ul>${specifications.map(cartSpecificationHtml).join('') || '<li>Параметры недоступны.</li>'}</ul></section></div>
+        <div class="oto-cart-body"><section><h4>В печати</h4><ul>${specifications.map((specification) => cartSpecificationHtml(specification, viewLink?.href)).join('') || '<li>Параметры недоступны.</li>'}</ul></section></div>
         <footer><div class="oto-cart-actions">${viewLink ? `<a class="oto-view" href="${escapeHtml(viewLink.href)}">Смотреть макеты</a>` : ''}${editLink ? `<a class="oto-edit" href="${escapeHtml(editLink.href)}">Редактировать</a>` : ''}</div></footer>`;
       if (removeLink) {
         removeLink.classList.add('oto-remove');
         card.querySelector('footer').append(removeLink);
       }
       cards.append(card);
+      const previewSlots = [...card.querySelectorAll('.oto-cart-preview')];
+      if (viewLink && previewSlots.length) void loadCartCoverPreviews(previewSlots, viewLink.href);
     });
 
     const originalItems = document.querySelector('#items');
