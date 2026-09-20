@@ -337,10 +337,179 @@
     panel.querySelector('.panel-heading .text-right')?.prepend(status);
   }
 
+  const SETTINGS = {
+    'Группа фотокниг': { icon: 'glyphicon-book', favorite: ['525'], rare: [] },
+    'Тип фотокниги': { icon: 'glyphicon-picture', favorite: ['13'], rare: [] },
+    'Формат': { icon: 'glyphicon-resize-full', favorite: ['3941', '3961'], rare: [] },
+    'Обложка': { icon: 'glyphicon-bookmark', favorite: ['24886'], rare: ['21315'] },
+    'Бумага': { icon: 'glyphicon-file', favorite: ['21380'], rare: ['21379'] },
+    'Дополнительная защита листов': { icon: 'glyphicon-tint', favorite: ['24363'], rare: ['21382'] },
+  };
+
+  const STANDARD_PROPERTY_IDS = ['525', '13', '24886', '21380', '24363'];
+
+  function settingsPanel(label) {
+    const heading = [...document.querySelectorAll('.calculator-params .panel-heading')]
+      .find((element) => clean(element.textContent).replace(/^(?:\s*[^А-Яа-яA-Za-z0-9]+\s*)/, '') === label || clean(element.dataset.otoLabel) === label);
+    return heading?.closest('.panel');
+  }
+
+  function activeSetting(label) {
+    return clean(settingsPanel(label)?.querySelector('.property-item_active span')?.textContent);
+  }
+
+  function grainIsSynchronized() {
+    const cover = activeSetting('Обложка').toLowerCase();
+    const protection = activeSetting('Дополнительная защита листов').toLowerCase();
+    if (cover.includes('зерно')) return protection.includes('зерно');
+    if (cover.includes('глянц')) return protection.includes('глянц');
+    if (cover.includes('матов')) return protection.includes('матов');
+    return Boolean(protection);
+  }
+
+  function updateSettingsToolbar() {
+    const toolbar = document.querySelector('.oto-settings-toolbar');
+    if (!toolbar) return;
+    const labels = ['Тип фотокниги', 'Формат', 'Обложка', 'Бумага', 'Дополнительная защита листов'];
+    const summary = toolbar.querySelector('.oto-settings-summary');
+    summary.innerHTML = labels.map((label) => {
+      const value = activeSetting(label);
+      return value ? `<span><b>${escapeHtml(label.replace('Дополнительная защита листов', 'Защита'))}</b>${escapeHtml(value)}</span>` : '';
+    }).join('');
+
+    const lamination = toolbar.querySelector('.oto-lamination-state');
+    const synchronized = grainIsSynchronized();
+    lamination.className = `oto-lamination-state ${synchronized ? 'is-good' : 'is-warning'}`;
+    lamination.innerHTML = synchronized
+      ? '<span class="glyphicon glyphicon-ok-sign"></span><strong>Ламинация согласована</strong>'
+      : '<span class="glyphicon glyphicon-warning-sign"></span><strong>Проверьте ламинацию обложки и листов</strong><button type="button">Синхронизировать</button>';
+    lamination.querySelector('button')?.addEventListener('click', () => {
+      const cover = activeSetting('Обложка').toLowerCase();
+      const wanted = cover.includes('глянц') ? '21382' : cover.includes('матов') ? '21381' : '24363';
+      document.querySelector(`.js-set-property[data-id="${wanted}"]`)?.click();
+      window.setTimeout(updateSettingsToolbar, 350);
+    });
+  }
+
+  function applyStandardPreset(button) {
+    button.disabled = true;
+    button.classList.add('is-applying');
+    let index = 0;
+    const applyNext = () => {
+      if (index >= STANDARD_PROPERTY_IDS.length) {
+        button.disabled = false;
+        button.classList.remove('is-applying');
+        window.setTimeout(updateSettingsToolbar, 350);
+        return;
+      }
+      const id = STANDARD_PROPERTY_IDS[index];
+      index += 1;
+      const option = document.querySelector(`.js-set-property[data-id="${id}"]`);
+      if (option && !option.classList.contains('property-item_active')) option.click();
+      window.setTimeout(applyNext, 280);
+    };
+    applyNext();
+  }
+
+  function createSettingsToolbar(params) {
+    const toolbar = document.createElement('section');
+    toolbar.className = 'oto-settings-toolbar';
+    toolbar.innerHTML = `
+      <div class="oto-settings-topline">
+        <div><p class="oto-kicker">Параметры печати</p><h2>Настройка тиража</h2><p>Частые параметры — сразу под рукой. Остальное не мешает работе.</p></div>
+        <button type="button" class="oto-standard-preset"><span class="glyphicon glyphicon-flash"></span><span><b>Мой стандарт</b><small>Лайфлат · зерно · без основы</small></span></button>
+      </div>
+      <div class="oto-lamination-state"></div>
+      <div class="oto-settings-summary"></div>`;
+    toolbar.querySelector('.oto-standard-preset').addEventListener('click', (event) => applyStandardPreset(event.currentTarget));
+    params.before(toolbar);
+    return toolbar;
+  }
+
+  function enhanceSettingsPanel(panel, label, config) {
+    if (panel.dataset.otoSettings === 'true') return false;
+    panel.dataset.otoSettings = 'true';
+    panel.classList.add('oto-settings-panel');
+    const heading = panel.querySelector('.panel-heading');
+    heading.dataset.otoLabel = label;
+    heading.innerHTML = `<span class="glyphicon ${config.icon}" aria-hidden="true"></span><strong>${escapeHtml(label)}</strong>`;
+
+    let hiddenCount = 0;
+    panel.querySelectorAll('.property-item').forEach((option) => {
+      const id = option.dataset.id;
+      const tag = document.createElement('small');
+      tag.className = 'oto-usage-tag';
+      if (config.favorite.includes(id)) {
+        option.classList.add('oto-option-favorite');
+        tag.textContent = 'часто';
+      } else if (config.rare.includes(id)) {
+        option.classList.add('oto-option-rare');
+        tag.textContent = 'редко';
+      } else {
+        option.classList.add('oto-option-more');
+        hiddenCount += 1;
+      }
+      if (tag.textContent) option.append(tag);
+      const check = document.createElement('span');
+      check.className = 'glyphicon glyphicon-ok oto-choice-check';
+      option.prepend(check);
+    });
+
+    if (hiddenCount) {
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'oto-more-toggle';
+      toggle.innerHTML = `<span class="glyphicon glyphicon-option-horizontal"></span> Ещё ${hiddenCount}`;
+      toggle.addEventListener('click', () => {
+        const expanded = panel.classList.toggle('oto-expanded');
+        toggle.innerHTML = expanded
+          ? '<span class="glyphicon glyphicon-chevron-up"></span> Скрыть редкие'
+          : `<span class="glyphicon glyphicon-option-horizontal"></span> Ещё ${hiddenCount}`;
+      });
+      panel.querySelector('.panel-body').append(toggle);
+    }
+    return true;
+  }
+
+  function enhanceSettings() {
+    const params = document.querySelector('.calculator-params');
+    if (!params) return false;
+    let changed = false;
+    Object.entries(SETTINGS).forEach(([label, config]) => {
+      const panel = settingsPanel(label);
+      if (panel) changed = enhanceSettingsPanel(panel, label, config) || changed;
+    });
+
+    params.querySelectorAll('.form-group').forEach((group) => {
+      const label = clean(group.querySelector('label')?.textContent);
+      if (label === 'Развороты' || label === 'Количество') {
+        group.classList.add('oto-counter');
+        if (!group.querySelector('.oto-counter-icon')) {
+          const icon = document.createElement('span');
+          icon.className = `glyphicon ${label === 'Развороты' ? 'glyphicon-th-large' : 'glyphicon-duplicate'} oto-counter-icon`;
+          group.querySelector('label')?.prepend(icon);
+        }
+      }
+    });
+
+    let toolbar = document.querySelector('.oto-settings-toolbar');
+    if (!toolbar) {
+      toolbar = createSettingsToolbar(params);
+      changed = true;
+    }
+    if (params.dataset.otoListening !== 'true') {
+      params.dataset.otoListening = 'true';
+      params.addEventListener('click', () => window.setTimeout(updateSettingsToolbar, 350));
+    }
+    if (changed) updateSettingsToolbar();
+    return true;
+  }
+
   function enhanceEditor() {
     const panels = [...document.querySelectorAll('.panel-book')];
     if (!panels.length) return false;
     document.body.classList.add('oto-editor');
+    enhanceSettings();
     panels.forEach(enhanceBook);
     ensureImageModal();
     return true;
