@@ -27,13 +27,17 @@
 .oto-products { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .oto-products li { display: flex; gap: 12px; justify-content: space-between; align-items: start; color: #2d4146; font-size: 14px; line-height: 1.35; }
 .oto-products b { flex: none; color: #087d80; }
-.oto-spec { padding: 13px 14px; border: 1px solid #d8e8e7; border-radius: 11px; background: #f9fdfd; }
+.oto-spec { padding: 12px 14px; border: 1px solid #d8e8e7; border-radius: 11px; background: #f9fdfd; }
 .oto-spec + .oto-spec { margin-top: 10px; }
-.oto-spec-title { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; color: #17383d; font-size: 14px; }
+.oto-spec-title { display: flex; justify-content: space-between; gap: 12px; color: #17383d; font-size: 14px; }
 .oto-spec-title span { flex: none; color: #087d80; font-weight: 800; }
-.oto-spec dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; margin: 0; }
+.oto-facts { display: flex; gap: 20px; margin-top: 8px; color: #314b50; font-size: 13px; }
+.oto-facts span { display: flex; gap: 5px; }
+.oto-facts b, .oto-spec dt { color: #668085; font-size: 11px; font-weight: 750; }
+.oto-materials { margin-top: 9px; color: #087d80; font-size: 12px; }
+.oto-materials summary { cursor: pointer; font-weight: 750; }
+.oto-spec dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 18px; margin: 10px 0 0; }
 .oto-spec dl div { min-width: 0; }
-.oto-spec dt { color: #668085; font-size: 11px; font-weight: 700; }
 .oto-spec dd { margin: 2px 0 0; color: #30474c; font-size: 13px; line-height: 1.3; }
 .oto-loading, .oto-muted { margin: 0; color: #668085; font-size: 14px; }
 .oto-loading::before { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: #22a6a3; content: ''; animation: oto-pulse 1.1s ease-in-out infinite; }

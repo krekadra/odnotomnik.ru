@@ -47,9 +47,11 @@
   }
 
   function textLines(root) {
-    return [...root.querySelectorAll('*')]
-      .filter((element) => element.children.length === 0)
-      .map((element) => clean(element.textContent))
+    // Product characteristics are text inside a <span> separated by <br> tags.
+    // Looking only at leaf elements drops that whole span because <br> is a child.
+    return (root.innerText || '')
+      .split(/\r?\n/)
+      .map(clean)
       .filter(Boolean);
   }
 
@@ -121,13 +123,12 @@
     return specification.map((item) => `
       <section class="oto-spec">
         <div class="oto-spec-title"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.quantity)} шт.</span></div>
-        <dl>
-          <div><dt>Формат</dt><dd>${escapeHtml(item.format)}</dd></div>
-          <div><dt>Развороты</dt><dd>${escapeHtml(item.spreads)}</dd></div>
+        <div class="oto-facts"><span><b>Формат</b>${escapeHtml(item.format)}</span><span><b>Развороты</b>${escapeHtml(item.spreads)}</span></div>
+        <details class="oto-materials"><summary>Материалы</summary><dl>
           <div><dt>Обложка</dt><dd>${escapeHtml(item.cover)}</dd></div>
           <div><dt>Бумага</dt><dd>${escapeHtml(item.paper)}</dd></div>
           <div><dt>Защита листов</dt><dd>${escapeHtml(item.protection)}</dd></div>
-        </dl>
+        </dl></details>
       </section>`).join('');
   }
 
