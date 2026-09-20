@@ -1,0 +1,46 @@
+.oto-original-table { display: none !important; }
+
+#odnotomnik-orders-extension { color: #17232c; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+#odnotomnik-orders-extension * { box-sizing: border-box; }
+.oto-shell { max-width: 1240px; margin: 26px auto 48px; padding: 0 16px; }
+.oto-page-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 26px 28px; border-radius: 20px; color: #fff; background: linear-gradient(120deg, #087d80, #075b63); box-shadow: 0 12px 32px rgb(7 91 99 / 22%); }
+.oto-page-head h2, .oto-page-head p { margin: 0; }
+.oto-page-head h2 { font-size: 30px; line-height: 1.15; }
+.oto-kicker { margin-bottom: 7px !important; font-size: 12px; font-weight: 800; letter-spacing: .1em; opacity: .72; text-transform: uppercase; }
+.oto-page-head > div > p:last-child { margin-top: 8px; opacity: .82; }
+.oto-progress { font-size: 13px; white-space: nowrap; opacity: .84; }
+.oto-orders { display: grid; gap: 16px; margin-top: 18px; }
+.oto-order { overflow: hidden; border: 1px solid #dce7e7; border-radius: 16px; background: #fff; box-shadow: 0 4px 16px rgb(20 53 55 / 7%); }
+.oto-order > header { display: flex; justify-content: space-between; gap: 18px; padding: 17px 20px; border-bottom: 1px solid #e6eeee; background: #f9fcfc; }
+.oto-order-number, .oto-date { margin: 0; }
+.oto-order-number { font-size: 18px; font-weight: 800; letter-spacing: .01em; }
+.oto-date { margin-top: 4px; color: #607277; font-size: 13px; }
+.oto-status { display: flex; align-items: center; align-content: center; flex-wrap: wrap; justify-content: end; gap: 8px; font-size: 13px; }
+.oto-status > span:first-child { padding: 6px 9px; border-radius: 999px; color: #075e62; background: #dff4f1; font-weight: 700; }
+.oto-paid { color: #158a52; font-weight: 750; }
+.oto-unpaid { color: #ae5c00; font-weight: 750; }
+.oto-pay { padding: 7px 10px; border-radius: 8px; color: #fff !important; background: #087d80; font-weight: 750; text-decoration: none !important; }
+.oto-summary { display: grid; grid-template-columns: minmax(235px, .72fr) minmax(0, 1.6fr); gap: 0; }
+.oto-summary > section { padding: 19px 20px; }
+.oto-summary > section:first-child { border-right: 1px solid #e6eeee; }
+.oto-summary h3 { margin: 0 0 12px; color: #486266; font-size: 12px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.oto-products { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.oto-products li { display: flex; gap: 12px; justify-content: space-between; align-items: start; color: #2d4146; font-size: 14px; line-height: 1.35; }
+.oto-products b { flex: none; color: #087d80; }
+.oto-spec { padding: 13px 14px; border: 1px solid #d8e8e7; border-radius: 11px; background: #f9fdfd; }
+.oto-spec + .oto-spec { margin-top: 10px; }
+.oto-spec-title { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; color: #17383d; font-size: 14px; }
+.oto-spec-title span { flex: none; color: #087d80; font-weight: 800; }
+.oto-spec dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; margin: 0; }
+.oto-spec dl div { min-width: 0; }
+.oto-spec dt { color: #668085; font-size: 11px; font-weight: 700; }
+.oto-spec dd { margin: 2px 0 0; color: #30474c; font-size: 13px; line-height: 1.3; }
+.oto-loading, .oto-muted { margin: 0; color: #668085; font-size: 14px; }
+.oto-loading::before { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: #22a6a3; content: ''; animation: oto-pulse 1.1s ease-in-out infinite; }
+.oto-order > footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 13px 20px; border-top: 1px solid #e6eeee; background: #fcfefe; }
+.oto-total { color: #162d32; font-size: 18px; font-weight: 850; }
+.oto-order details { max-width: 75%; color: #526a6e; font-size: 13px; }
+.oto-order summary { cursor: pointer; color: #087d80; font-weight: 750; }
+.oto-order details p { margin: 7px 0 0; line-height: 1.45; white-space: pre-line; }
+@keyframes oto-pulse { 50% { opacity: .25; transform: scale(.65); } }
+@media (max-width: 720px) { .oto-shell { padding: 0 10px; } .oto-page-head { display: block; padding: 21px; } .oto-progress { margin-top: 14px !important; white-space: normal; } .oto-summary { grid-template-columns: 1fr; } .oto-summary > section:first-child { border-right: 0; border-bottom: 1px solid #e6eeee; } .oto-spec dl { grid-template-columns: 1fr; } .oto-order > header, .oto-order > footer { padding-inline: 15px; } .oto-summary > section { padding-inline: 15px; } .oto-order details { max-width: 65%; } }

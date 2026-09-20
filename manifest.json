@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Однотомник — удобные заказы",
+  "description": "Понятный список заказов и спецификаций печати на odnotomnik.ru.",
+  "version": "0.1.0",
+  "content_scripts": [
+    {
+      "matches": ["https://odnotomnik.ru/profile/orders*"],
+      "js": ["src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
