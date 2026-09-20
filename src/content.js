@@ -181,5 +181,66 @@
     render(root, orders, `Спецификации загружены: ${orders.length}`);
   }
 
-  run();
+  function cartSpecifications(rawHtml) {
+    const scratch = document.createElement('div');
+    scratch.innerHTML = rawHtml || '';
+    const lines = (scratch.innerText || '').split(/\r?\n/).map(clean).filter(Boolean);
+    const specifications = [];
+    let specification = null;
+
+    for (const line of lines) {
+      if (line.startsWith('Тип фотокниги:')) {
+        if (specification) specifications.push(specification);
+        specification = { title: line.replace('Тип фотокниги:', '').trim(), fields: {} };
+      } else if (specification && line.includes(':')) {
+        const divider = line.indexOf(':');
+        specification.fields[line.slice(0, divider)] = line.slice(divider + 1).trim();
+      }
+    }
+    if (specification) specifications.push(specification);
+    return specifications;
+  }
+
+  function cartSpecificationHtml(specification) {
+    const fields = specification.fields;
+    return `<li><strong>${escapeHtml(specification.title)}</strong><span>${escapeHtml(fields['Формат'] || 'Формат не указан')} · ${escapeHtml(fields['Развороты'] || 'развороты не указаны')}</span><small>${escapeHtml(fields['Обложка'] || '')}</small></li>`;
+  }
+
+  function runCart() {
+    if (document.getElementById(ROOT_ID)) return;
+    const items = [...document.querySelectorAll('#items > .hidden-xs .item.row[data-id]')];
+    if (!items.length) return;
+
+    const root = document.createElement('section');
+    root.id = ROOT_ID;
+    root.className = 'oto-cart';
+    root.innerHTML = `<header class="oto-cart-head"><p class="oto-kicker">Корзина</p><h2>Что сейчас в печати</h2><p>Параметры уже в корзине — открывать каждый макет не нужно.</p></header><div class="oto-cart-items"></div>`;
+    const cards = root.querySelector('.oto-cart-items');
+
+    items.forEach((item) => {
+      const type = item.querySelector('.type');
+      const viewLink = type?.querySelector('a[href*="/designer/view/"]');
+      const editLink = type?.querySelector('a[href*="/designer/edit/"]');
+      const removeLink = item.querySelector('.js-remove-item');
+      const specifications = cartSpecifications(type?.dataset.originalTitle || type?.getAttribute('data-original-title'));
+      const card = document.createElement('article');
+      card.className = 'oto-cart-item';
+      card.innerHTML = `
+        <header><div><h3>${escapeHtml(clean(type?.childNodes[0]?.textContent) || 'Фотокнига')}</h3><p>${escapeHtml(clean(item.querySelector('.item-count')?.textContent))} шт. · ${escapeHtml(clean(item.querySelector('.item-cost')?.textContent))} ${escapeHtml(clean(item.querySelector('.currency')?.textContent))}</p></div></header>
+        <div class="oto-cart-body"><section><h4>В печати</h4><ul>${specifications.map(cartSpecificationHtml).join('') || '<li>Параметры недоступны.</li>'}</ul></section></div>
+        <footer><div class="oto-cart-actions">${viewLink ? `<a class="oto-view" href="${escapeHtml(viewLink.href)}">Смотреть макеты</a>` : ''}${editLink ? `<a class="oto-edit" href="${escapeHtml(editLink.href)}">Редактировать</a>` : ''}</div></footer>`;
+      if (removeLink) {
+        removeLink.classList.add('oto-remove');
+        card.querySelector('footer').append(removeLink);
+      }
+      cards.append(card);
+    });
+
+    const originalItems = document.querySelector('#items');
+    originalItems.before(root);
+    originalItems.classList.add('oto-original-cart');
+  }
+
+  if (location.pathname === '/shopcart') runCart();
+  else if (location.pathname === '/profile/orders') run();
 })();

@@ -1,4 +1,5 @@
 .oto-original-table { display: none !important; }
+.oto-original-cart { display: none !important; }
 
 #odnotomnik-orders-extension { color: #17232c; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 #odnotomnik-orders-extension * { box-sizing: border-box; }
@@ -46,5 +47,27 @@
 .oto-order details { max-width: 75%; color: #526a6e; font-size: 13px; }
 .oto-order summary { cursor: pointer; color: #087d80; font-weight: 750; }
 .oto-order details p { margin: 7px 0 0; line-height: 1.45; white-space: pre-line; }
+.oto-cart { max-width: 1240px; margin: 26px auto 48px; padding: 0 16px; color: #17232c; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.oto-cart * { box-sizing: border-box; }
+.oto-cart-head { padding: 25px 28px; border-radius: 18px; color: #fff; background: linear-gradient(120deg, #087d80, #075b63); }
+.oto-cart-head h2, .oto-cart-head p { margin: 0; }
+.oto-cart-head h2 { font-size: 28px; }
+.oto-cart-head > p:last-child { margin-top: 8px; opacity: .84; }
+.oto-cart-items { display: grid; gap: 16px; margin-top: 18px; }
+.oto-cart-item { overflow: hidden; border: 1px solid #dce7e7; border-radius: 16px; background: #fff; box-shadow: 0 4px 16px rgb(20 53 55 / 7%); }
+.oto-cart-item > header { padding: 17px 20px; background: #f9fcfc; border-bottom: 1px solid #e6eeee; }
+.oto-cart-item h3, .oto-cart-item p { margin: 0; }
+.oto-cart-item h3 { font-size: 18px; font-weight: 800; }
+.oto-cart-item header p { margin-top: 5px; color: #087d80; font-size: 14px; font-weight: 750; }
+.oto-cart-body { padding: 18px 20px; }
+.oto-cart-body h4 { margin: 0 0 11px; color: #486266; font-size: 12px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.oto-cart-body ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.oto-cart-body li { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(180px, .7fr) minmax(260px, 1fr); gap: 16px; align-items: center; padding: 12px 14px; border: 1px solid #d8e8e7; border-radius: 10px; background: #f9fdfd; color: #314b50; font-size: 14px; }
+.oto-cart-body li strong { color: #17383d; }.oto-cart-body li small { color: #668085; font-size: 12px; }
+.oto-cart-item footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 20px; border-top: 1px solid #e6eeee; background: #fcfefe; }
+.oto-cart-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.oto-cart-actions a { padding: 8px 11px; border-radius: 8px; font-size: 13px; font-weight: 750; text-decoration: none !important; }
+.oto-view { color: #fff !important; background: #087d80; }.oto-edit { color: #087d80 !important; border: 1px solid #9dcfcf; }
+.oto-remove { color: #bf4f4f !important; font-size: 13px; text-decoration: none !important; }
 @keyframes oto-pulse { 50% { opacity: .25; transform: scale(.65); } }
-@media (max-width: 720px) { .oto-shell { padding: 0 10px; } .oto-page-head { display: block; padding: 21px; } .oto-progress { margin-top: 14px !important; white-space: normal; } .oto-summary { grid-template-columns: 1fr; } .oto-summary > section:first-child { border-right: 0; border-bottom: 1px solid #e6eeee; } .oto-spec dl { grid-template-columns: 1fr; } .oto-order > header, .oto-order > footer { padding-inline: 15px; } .oto-summary > section { padding-inline: 15px; } .oto-order details { max-width: 65%; } }
+@media (max-width: 720px) { .oto-shell, .oto-cart { padding: 0 10px; } .oto-page-head { display: block; padding: 21px; } .oto-progress { margin-top: 14px !important; white-space: normal; } .oto-summary { grid-template-columns: 1fr; } .oto-summary > section:first-child { border-right: 0; border-bottom: 1px solid #e6eeee; } .oto-spec dl { grid-template-columns: 1fr; } .oto-order > header, .oto-order > footer { padding-inline: 15px; } .oto-summary > section { padding-inline: 15px; } .oto-order details { max-width: 65%; } .oto-cart-head { padding: 21px; } .oto-cart-body li { grid-template-columns: 1fr; gap: 4px; } .oto-cart-item > header, .oto-cart-body, .oto-cart-item footer { padding-inline: 15px; } }
