@@ -349,9 +349,10 @@
   const STANDARD_PROPERTY_IDS = ['525', '13', '24886', '21380', '24363'];
 
   function settingsPanel(label) {
-    const heading = [...document.querySelectorAll('.calculator-params .panel-heading')]
-      .find((element) => clean(element.textContent).replace(/^(?:\s*[^А-Яа-яA-Za-z0-9]+\s*)/, '') === label || clean(element.dataset.otoLabel) === label);
-    return heading?.closest('.panel');
+    return [...document.querySelectorAll('.calculator-params .panel')].find((panel) => {
+      const heading = panel.querySelector(':scope > .panel-heading');
+      return heading?.dataset.otoLabel === label || clean(heading?.textContent) === label;
+    });
   }
 
   function activeSetting(label) {
@@ -359,11 +360,7 @@
   }
 
   function grainIsSynchronized() {
-    const cover = activeSetting('Обложка').toLowerCase();
     const protection = activeSetting('Дополнительная защита листов').toLowerCase();
-    if (cover.includes('зерно')) return protection.includes('зерно');
-    if (cover.includes('глянц')) return protection.includes('глянц');
-    if (cover.includes('матов')) return protection.includes('матов');
     return Boolean(protection);
   }
 
@@ -381,12 +378,10 @@
     const synchronized = grainIsSynchronized();
     lamination.className = `oto-lamination-state ${synchronized ? 'is-good' : 'is-warning'}`;
     lamination.innerHTML = synchronized
-      ? '<span class="glyphicon glyphicon-ok-sign"></span><strong>Ламинация согласована</strong>'
-      : '<span class="glyphicon glyphicon-warning-sign"></span><strong>Проверьте ламинацию обложки и листов</strong><button type="button">Синхронизировать</button>';
+      ? `<span class="glyphicon glyphicon-ok-sign"></span><strong>Защита листов:</strong><span>${escapeHtml(activeSetting('Дополнительная защита листов'))}</span>`
+      : '<span class="glyphicon glyphicon-warning-sign"></span><strong>Не выбрана защита листов</strong><button type="button">Выбрать зерно</button>';
     lamination.querySelector('button')?.addEventListener('click', () => {
-      const cover = activeSetting('Обложка').toLowerCase();
-      const wanted = cover.includes('глянц') ? '21382' : cover.includes('матов') ? '21381' : '24363';
-      document.querySelector(`.js-set-property[data-id="${wanted}"]`)?.click();
+      document.querySelector('.js-set-property[data-id="24363"]')?.click();
       window.setTimeout(updateSettingsToolbar, 350);
     });
   }
@@ -480,16 +475,25 @@
       if (panel) changed = enhanceSettingsPanel(panel, label, config) || changed;
     });
 
-    params.querySelectorAll('.form-group').forEach((group) => {
+    const counters = [...params.querySelectorAll('.form-group')].filter((group) => {
       const label = clean(group.querySelector('label')?.textContent);
-      if (label === 'Развороты' || label === 'Количество') {
-        group.classList.add('oto-counter');
-        if (!group.querySelector('.oto-counter-icon')) {
-          const icon = document.createElement('span');
-          icon.className = `glyphicon ${label === 'Развороты' ? 'glyphicon-th-large' : 'glyphicon-duplicate'} oto-counter-icon`;
-          group.querySelector('label')?.prepend(icon);
-        }
+      return label === 'Развороты' || label === 'Количество';
+    });
+    let counterRow = params.querySelector('.oto-counters-row');
+    if (!counterRow && counters.length) {
+      counterRow = document.createElement('div');
+      counterRow.className = 'oto-counters-row';
+      params.querySelector(':scope > .row')?.append(counterRow);
+    }
+    counters.forEach((group) => {
+      const label = clean(group.querySelector('label')?.textContent);
+      group.classList.add('oto-counter');
+      if (!group.querySelector('.oto-counter-icon')) {
+        const icon = document.createElement('span');
+        icon.className = `glyphicon ${label === 'Развороты' ? 'glyphicon-th-large' : 'glyphicon-duplicate'} oto-counter-icon`;
+        group.querySelector('label')?.prepend(icon);
       }
+      if (counterRow && group.parentElement !== counterRow) counterRow.append(group);
     });
 
     let toolbar = document.querySelector('.oto-settings-toolbar');
